@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JiaofeiDao">
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.fangwu_id as fangwuId
+        ,a.jiaofei_name as jiaofeiName
+        ,a.jiaofei_yuefen as jiaofeiYuefen
+        ,a.jiaofei_types as jiaofeiTypes
+        ,a.new_money as newMoney
+        ,a.jiaofei_content as jiaofeiContent
+        ,a.jiaofei_shifou_types as jiaofeiShifouTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JiaofeiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,fangwu.fangwu_name as fangwuName
+        ,fangwu.fangwu_address as fangwuAddress
+        ,fangwu.fangwu_photo as fangwuPhoto
+        ,fangwu.fangwu_types as fangwuTypes
+        ,fangwu.fangwu_delete as fangwuDelete
+        ,fangwu.fangwu_content as fangwuContent
+
+        FROM jiaofei  a
+        left JOIN fangwu fangwu ON a.fangwu_id = fangwu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.fangwuId != null and params.fangwuId != ''">
+                and a.fangwu_id = #{params.fangwuId}
+            </if>
+            <if test=" params.jiaofeiName != '' and params.jiaofeiName != null and params.jiaofeiName != 'null' ">
+                and a.jiaofei_name like CONCAT('%',#{params.jiaofeiName},'%')
+            </if>
+            <if test=" params.jiaofeiYuefen != '' and params.jiaofeiYuefen != null and params.jiaofeiYuefen != 'null' ">
+                and a.jiaofei_yuefen like CONCAT('%',#{params.jiaofeiYuefen},'%')
+            </if>
+            <if test="params.jiaofeiTypes != null and params.jiaofeiTypes != ''">
+                and a.jiaofei_types = #{params.jiaofeiTypes}
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and a.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and a.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test=" params.jiaofeiContent != '' and params.jiaofeiContent != null and params.jiaofeiContent != 'null' ">
+                and a.jiaofei_content like CONCAT('%',#{params.jiaofeiContent},'%')
+            </if>
+            <if test="params.jiaofeiShifouTypes != null and params.jiaofeiShifouTypes != ''">
+                and a.jiaofei_shifou_types = #{params.jiaofeiShifouTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+            <if test="params.yonghuId != null  and params.yonghuId != ''">
+                and fangwu.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.fangwuName != '' and params.fangwuName != null and params.fangwuName != 'null' ">
+                and fangwu.fangwu_name like CONCAT('%',#{params.fangwuName},'%')
+            </if>
+            <if test=" params.fangwuAddress != '' and params.fangwuAddress != null and params.fangwuAddress != 'null' ">
+                and fangwu.fangwu_address like CONCAT('%',#{params.fangwuAddress},'%')
+            </if>
+            <if test="params.fangwuTypes != null  and params.fangwuTypes != ''">
+                and fangwu.fangwu_types = #{params.fangwuTypes}
+            </if>
+
+            <if test="params.fangwuDeleteStart != null  and params.fangwuDeleteStart != '' ">
+                <![CDATA[  and fangwu.fangwu_delete >= #{params.fangwuDeleteStart}   ]]>
+            </if>
+            <if test="params.fangwuDeleteEnd != null  and params.fangwuDeleteEnd != '' ">
+                <![CDATA[  and fangwu.fangwu_delete <= #{params.fangwuDeleteEnd}   ]]>
+            </if>
+            <if test="params.fangwuDelete != null  and params.fangwuDelete != '' ">
+                and fangwu.fangwu_delete = #{params.fangwuDelete}
+            </if>
+            <if test=" params.fangwuContent != '' and params.fangwuContent != null and params.fangwuContent != 'null' ">
+                and fangwu.fangwu_content like CONCAT('%',#{params.fangwuContent},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
